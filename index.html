@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A little something for you 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg1: #ffe9f1;
+    --bg2: #fbc8dc;
+    --paper: #fff7fa;
+    --env-back: #ec9cba;
+    --env-left: #f6b9d0;
+    --env-right: #f2abc6;
+    --env-bottom: #f9cde0;
+    --env-flap-top: #fddbe8;
+    --env-flap-bottom: #f7bcd2;
+    --text: #a8527a;
+    --ease: cubic-bezier(.22, .8, .3, 1);
+    --w: min(88vw, 480px);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    min-height: 100dvh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 1.6rem;
+    padding: 1rem;
+    background: radial-gradient(circle at 30% 20%, var(--bg1), var(--bg2));
+    font-family: 'Dancing Script', 'Segoe Script', cursive;
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  /* floating hearts in the background */
+  .hearts { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .hearts span {
+    position: absolute; bottom: -40px;
+    opacity: 0;
+    color: #fff;
+    animation: floatUp linear infinite;
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(0) scale(.8); opacity: 0; }
+    15%  { opacity: .55; }
+    100% { transform: translateY(-110vh) scale(1.2); opacity: 0; }
+  }
+  .hearts span:nth-child(1) { left: 8%;  font-size: 22px; animation-duration: 14s; animation-delay: 0s; }
+  .hearts span:nth-child(2) { left: 22%; font-size: 14px; animation-duration: 11s; animation-delay: 3s; }
+  .hearts span:nth-child(3) { left: 40%; font-size: 26px; animation-duration: 16s; animation-delay: 6s; }
+  .hearts span:nth-child(4) { left: 58%; font-size: 16px; animation-duration: 12s; animation-delay: 1.5s; }
+  .hearts span:nth-child(5) { left: 74%; font-size: 24px; animation-duration: 15s; animation-delay: 4.5s; }
+  .hearts span:nth-child(6) { left: 90%; font-size: 15px; animation-duration: 13s; animation-delay: 8s; }
+
+  /* The stage reserves space above the envelope, so nothing jumps */
+  .stage {
+    position: relative; z-index: 1;
+    width: var(--w);
+    padding-top: calc(var(--w) * 0.36);
+  }
+
+  .envelope {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    cursor: pointer;}

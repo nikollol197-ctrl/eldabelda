@@ -45,4 +45,187 @@
     animation: floatUp linear infinite;
   }
   @keyframes floatUp {
-    0%   { transform: translateY(0) scale(.8); opacity
+    0%   { transform: translateY(0) scale(.8); opacity: 0; }
+    15%  { opacity: .55; }
+    100% { transform: translateY(-110vh) scale(1.2); opacity: 0; }
+  }
+  .hearts span:nth-child(1) { left: 8%;  font-size: 22px; animation-duration: 14s; animation-delay: 0s; }
+  .hearts span:nth-child(2) { left: 22%; font-size: 14px; animation-duration: 11s; animation-delay: 3s; }
+  .hearts span:nth-child(3) { left: 40%; font-size: 26px; animation-duration: 16s; animation-delay: 6s; }
+  .hearts span:nth-child(4) { left: 58%; font-size: 16px; animation-duration: 12s; animation-delay: 1.5s; }
+  .hearts span:nth-child(5) { left: 74%; font-size: 24px; animation-duration: 15s; animation-delay: 4.5s; }
+  .hearts span:nth-child(6) { left: 90%; font-size: 15px; animation-duration: 13s; animation-delay: 8s; }
+
+  /* The stage reserves space above the envelope, so nothing jumps */
+  .stage {
+    position: relative; z-index: 1;
+    width: var(--w);
+    padding-top: calc(var(--w) * 0.36);
+  }
+
+  .envelope {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    cursor: pointer;
+    border: 0; padding: 0; background: none;
+    -webkit-tap-highlight-color: transparent;
+    filter: drop-shadow(0 18px 24px rgba(168, 82, 122, .28));
+  }
+  .envelope:focus-visible { outline: 3px solid #fff; outline-offset: 6px; border-radius: 10px; }
+
+  .back {
+    position: absolute; inset: 0;
+    background: var(--env-back);
+    border-radius: 8px;
+  }
+
+  /* The letter (holds the video) */
+  .letter {
+    position: absolute;
+    left: 5%; right: 5%; bottom: 5%;
+    height: 90%;
+    background: linear-gradient(180deg, #fff, var(--paper));
+    border-radius: 6px;
+    padding: 2.8%;
+    z-index: 2;
+    box-shadow: 0 2px 10px rgba(168, 82, 122, .2);
+    transition: transform 1s var(--ease) .45s;
+    will-change: transform;
+  }
+  .letter iframe {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    border: 0;
+    border-radius: 3px;
+    background: #2b1620;
+  }
+  .envelope.open .letter { transform: translate3d(0, -58%, 0); }
+
+  /* Front pocket (stays in front of the letter's bottom edge) */
+  .front { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+  .front i { position: absolute; inset: 0; border-radius: 8px; }
+  .front .l { background: linear-gradient(90deg, var(--env-left), #f9c6da);
+              clip-path: polygon(0 0, 52% 56%, 0 100%); }
+  .front .r { background: linear-gradient(270deg, var(--env-right), #f7bcd2);
+              clip-path: polygon(100% 0, 48% 56%, 100% 100%); }
+  .front .b { background: linear-gradient(0deg, var(--env-bottom), #fbd9e7);
+              clip-path: polygon(0 100%, 50% 45%, 100% 100%); }
+
+  /* Flap */
+  .flap {
+    position: absolute; left: 0; right: 0; top: 0;
+    height: 56%;
+    z-index: 5;
+    transform-origin: 50% 0;
+    transform: perspective(1400px) rotateX(0deg);
+    transition: transform .7s var(--ease), z-index 0s linear .35s;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .flap::before {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, var(--env-flap-top), var(--env-flap-bottom));
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    border-radius: 8px 8px 0 0;
+  }
+  .envelope.open .flap { transform: perspective(1400px) rotateX(180deg); z-index: 1; }
+
+  /* Wax-style heart seal */
+  .seal {
+    position: absolute; left: 50%; top: 56%;
+    width: 13%; aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    z-index: 6;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ff7fae, #d93a78 70%);
+    color: #fff;
+    font-size: clamp(14px, 4.5vw, 24px);
+    box-shadow: 0 3px 8px rgba(120, 20, 60, .35), inset 0 -2px 4px rgba(0,0,0,.15);
+    transition: opacity .3s ease, scale .4s var(--ease);
+    animation: beat 2.2s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes beat { 0%, 100% { scale: 1; } 50% { scale: 1.1; } }
+  .envelope.open .seal { opacity: 0; scale: .6; animation: none; }
+
+  .hint {
+    position: relative; z-index: 1;
+    margin: 0;
+    font-size: clamp(1.2rem, 4.5vw, 1.7rem);
+    text-align: center;
+    transition: opacity .4s ease;
+  }
+  .hint.fade { opacity: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hearts, .seal { animation: none; }
+    .letter, .flap { transition-duration: .01s; transition-delay: 0s; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="hearts" aria-hidden="true">
+    <span>♥</span><span>♥</span><span>♥</span><span>♥</span><span>♥</span><span>♥</span>
+  </div>
+
+  <div class="stage">
+    <button class="envelope" id="env" aria-label="Open the envelope and play the video">
+      <div class="back"></div>
+      <div class="letter" id="letter">
+        <iframe id="vid" src="https://www.youtube-nocookie.com/embed/khQYDlR6eeo?enablejsapi=1&autoplay=0&rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div class="front"><i class="l"></i><i class="r"></i><i class="b"></i></div>
+      <div class="flap"></div>
+      <div class="seal" aria-hidden="true">♥</div>
+    </button>
+  </div>
+
+  <p class="hint" id="hint">Tap the envelope to open 💌</p>
+
+<script>
+  const env = document.getElementById('env');
+  const vid = document.getElementById('vid');
+  const hint = document.getElementById('hint');
+  let busy = false;
+
+  function toggleEnvelope() {
+    if (busy) return;
+    
+    if (!env.classList.contains('open')) {
+      env.classList.add('open');
+      hint.classList.add('fade');
+      busy = true;
+      
+      // Po otevření dopisu spustí video přímo v okýnku dopisu bez vyvolání blokovaného režimu celé obrazovky
+      setTimeout(() => {
+        busy = false;
+        vid.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+      }, 1200);
+    } else {
+      env.classList.remove('open');
+      hint.textContent = 'Tap the envelope to open 💌';
+      hint.classList.remove('fade');
+      
+      // Pozastaví video při zavření obálky
+      vid.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+      busy = true; 
+      setTimeout(() => busy = false, 700);
+    }
+  }
+
+  env.addEventListener('click', toggleEnvelope);
+  env.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleEnvelope();
+    }
+  });
+</script>
+</body>
+</html>

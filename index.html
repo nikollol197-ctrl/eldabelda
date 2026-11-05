@@ -230,8 +230,10 @@
   <button class="close-fs" id="closeFs" aria-label="Close">✕</button>
 
 <script>
-  // Přímý odkaz na tvoje YouTube video
-  const VIDEO_SRC = 'https://www.youtube.com/embed/khQYDlR6eeo?autoplay=1&rel=0&playsinline=1&modestbranding=1';
+  // YouTube video ID (from https://www.youtube.com/watch?v=khQYDlR6eeo)
+  const VIDEO_ID = 'khQYDlR6eeo';
+  const VIDEO_SRC = 'https://www.youtube.com/embed/' + VIDEO_ID +
+    '?autoplay=1&rel=0&playsinline=1&modestbranding=1';
 
   const env = document.getElementById('env');
   const letter = document.getElementById('letter');
@@ -243,7 +245,7 @@
   const fsElement = () => document.fullscreenElement || document.webkitFullscreenElement;
 
   async function goFullscreen() {
-    // Načte video po kliknutí
+    // Load the video now (this is after a tap, so autoplay is allowed)
     yt.src = VIDEO_SRC;
     try {
       if (letter.requestFullscreen)            await letter.requestFullscreen();
@@ -260,7 +262,7 @@
     letter.classList.remove('fake-fs');
     closeFs.classList.remove('show');
     if (fsElement()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-    yt.removeAttribute('src');          // zastaví video
+    yt.removeAttribute('src');          // stops the video
     env.classList.remove('open');
     hint.textContent = 'Tap the envelope to open 💌';
     hint.classList.remove('fade');
@@ -273,7 +275,7 @@
       env.classList.add('open');
       hint.classList.add('fade');
       busy = true;
-      timer = setTimeout(() => { busy = false; goFullscreen(); }, 1500); // po vysunutí dopisu
+      timer = setTimeout(() => { busy = false; goFullscreen(); }, 1500); // after the letter has slid out
     } else {
       closeEnvelope();
     }
@@ -286,7 +288,7 @@
 
   closeFs.addEventListener('click', closeEnvelope);
 
-  // Zrušení fullscreenu zavře obálku
+  // Leaving fullscreen (Esc / back gesture) closes the envelope again
   const onFsChange = () => { if (!fsElement() && env.classList.contains('open') && !letter.classList.contains('fake-fs')) closeEnvelope(); };
   document.addEventListener('fullscreenchange', onFsChange);
   document.addEventListener('webkitfullscreenchange', onFsChange);
